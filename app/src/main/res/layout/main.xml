@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/button_previous"
+            android:layout_width="60dp"
+            android:layout_height="match_parent"
+            android:text="B"
+            android:textSize="24sp"
+            android:textColor="@color/colorBlack"/>
+        <EditText
+            android:id="@+id/editor"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:textSize="20sp"
+            android:gravity="center"/>
+        <Button
+            android:id="@+id/button_next"
+            android:layout_width="60dp"
+            android:layout_height="match_parent"
+            android:text="N"
+            android:textSize="24sp"
+            android:textColor="@color/colorBlack"/>
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <!-- GOOGLE TTS -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="1px"
+                        android:layout_weight="1"
+                        android:layout_gravity="center_vertical"
+                        android:background="@color/colorBlack"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_margin="4dp"
+                        android:gravity="center"
+                        android:text="GOOGLE TTS"/>
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="1px"
+                        android:layout_weight="1"
+                        android:layout_gravity="center_vertical"
+                        android:background="@color/colorBlack"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="pitch"/>
+                        <SeekBar
+                            android:id="@+id/seekbar_google_pitch"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:max="2"
+                            android:progress="1"/>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="speed"/>
+                        <SeekBar
+                            android:id="@+id/seekbar_google_speed"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:max="2"
+                            android:progress="1"/>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="voice"/>
+                    <Spinner
+                        android:id="@+id/spinner_google_voice"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="40dp"
+                        android:gravity="center"/>
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/button_google"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="SPEAK"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <!-- NAVER CLOVA -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="1px"
+                        android:layout_weight="1"
+                        android:layout_gravity="center_vertical"
+                        android:background="@color/colorBlack"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_margin="4dp"
+                        android:gravity="center"
+                        android:text="NAVER CLOVA"/>
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="1px"
+                        android:layout_weight="1"
+                        android:layout_gravity="center_vertical"
+                        android:background="@color/colorBlack"/>
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="speed"/>
+                    <SeekBar
+                        android:id="@+id/seekbar_naver_speed"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:max="10"
+                        android:progress="5"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="voice"/>
+                    <Spinner
+                        android:id="@+id/spinner_naver_voice"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="40dp"
+                        android:gravity="center"/>
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/button_naver"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="SPEAK"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <!-- AMAZON POLLY -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="1px"
+                        android:layout_weight="1"
+                        android:layout_gravity="center_vertical"
+                        android:background="@color/colorBlack"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_margin="4dp"
+                        android:gravity="center"
+                        android:text="AMAZON POLLY"/>
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="1px"
+                        android:layout_weight="1"
+                        android:layout_gravity="center_vertical"
+                        android:background="@color/colorBlack"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="voice"/>
+                    <Spinner
+                        android:id="@+id/spinner_amazon_voice"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="40dp"
+                        android:gravity="center"/>
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/button_amazon"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="SPEAK"/>
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>
