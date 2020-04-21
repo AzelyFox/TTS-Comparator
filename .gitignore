@@ -16,3 +16,4 @@
 /gradle
 gradlew
 gradlew.bat
+app/src/main/java/kr/devx/ttscomparator/Constants.java

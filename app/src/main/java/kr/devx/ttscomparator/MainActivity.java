@@ -1,11 +1,14 @@
 package kr.devx.ttscomparator;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.Voice;
 import android.util.Log;
@@ -17,7 +20,6 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
 import com.amazonaws.mobile.client.AWSMobileClient;
-import com.amazonaws.mobile.client.Callback;
 import com.amazonaws.mobile.client.UserStateDetails;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.polly.AmazonPollyPresigningClient;
@@ -25,8 +27,10 @@ import com.amazonaws.services.polly.model.DescribeVoicesRequest;
 import com.amazonaws.services.polly.model.DescribeVoicesResult;
 import com.amazonaws.services.polly.model.OutputFormat;
 import com.amazonaws.services.polly.model.SynthesizeSpeechPresignRequest;
+import okhttp3.*;
+import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
 
 	private Button buttonPrevious, buttonNext;
 	private EditText editor;
-	private Button buttonGoogle, buttonNaver, buttonAmazon;
+	private Button buttonGoogle, buttonNaver, buttonAmazon, buttonDownload;
 
 	private ArrayList<String> englishWords;
 	private static int englishWordIndex = 0;
@@ -90,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
 		buttonGoogle = findViewById(R.id.button_google);
 		buttonNaver = findViewById(R.id.button_naver);
 		buttonAmazon = findViewById(R.id.button_amazon);
+		buttonDownload = findViewById(R.id.button_download);
 		googleSeekerPitch = findViewById(R.id.seekbar_google_pitch);
 		googleSeekerSpeed = findViewById(R.id.seekbar_google_speed);
 		googleSpinner = findViewById(R.id.spinner_google_voice);
@@ -242,6 +247,31 @@ public class MainActivity extends AppCompatActivity {
 				amazonPlayer.prepareAsync();
 			}
 		});
+		buttonDownload.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				SynthesizeSpeechPresignRequest synthesizeSpeechPresignRequest = new SynthesizeSpeechPresignRequest()
+						.withText(editor.getText().toString().trim())
+						.withVoiceId(amazonVoice.getId())
+						.withOutputFormat(OutputFormat.Mp3);
+				URL presignedSynthesizeSpeechUrl = amazonTTS.getPresignedSynthesizeSpeechUrl(synthesizeSpeechPresignRequest);
+
+				Log.i(TAG, "Playing speech from presigned URL: " + presignedSynthesizeSpeechUrl);
+
+				final String fileName = editor.getText().toString().trim().concat(".mp3");
+				final FileDownloadTask fileDownloadTask = new FileDownloadTask(MainActivity.this, presignedSynthesizeSpeechUrl.toString(), null, fileName, new FileDownloadCallback() {
+					@Override
+					public void onDownloadStatus(boolean success, String message) {
+						if (success) {
+							Toast.makeText(MainActivity.this, fileName + " 다운로드 성공", Toast.LENGTH_SHORT).show();
+						} else {
+							Toast.makeText(MainActivity.this, "다운로드 실패 : " + message, Toast.LENGTH_LONG).show();
+						}
+					}
+				});
+				fileDownloadTask.execute();
+			}
+		});
 	}
 
 	private void initializeEngines() {
@@ -298,7 +328,9 @@ public class MainActivity extends AppCompatActivity {
 								amazonSpinner.setAdapter(amazonAdapter);
 								amazonVoice = amazonVoices.get(0);
 								buttonAmazon.setEnabled(true);
+								buttonDownload.setEnabled(true);
 								amazonSpinner.setEnabled(true);
+								buttonAmazon.setText("SPEAK");
 							}
 						});
 
@@ -312,6 +344,7 @@ public class MainActivity extends AppCompatActivity {
 		voiceGettingThread.start();
 		buttonAmazon.setText("LOADING");
 		buttonAmazon.setEnabled(false);
+		buttonDownload.setEnabled(false);
 		amazonSpinner.setEnabled(false);
 	}
 
@@ -377,6 +410,139 @@ public class MainActivity extends AppCompatActivity {
 				return false;
 			}
 		});
+	}
+
+	public interface FileDownloadCallback {
+		void onDownloadStatus(boolean success, String message);
+	}
+
+	public class FileDownloadTask extends AsyncTask<String, Integer, String> {
+
+		public boolean TASK_FINISHED = false;
+		public boolean TASK_RESULT = false;
+
+		private Context context;
+		private String fileUrl;
+		private String filePath;
+		private String fileName;
+		private FileDownloadCallback fileCallback;
+
+		InputStream input;
+		OutputStream output;
+		ByteArrayOutputStream byteOutput;
+
+		private View downloadIndicator;
+
+		String downloadedPath = null;
+		boolean isSuccess = false;
+
+		OkHttpClient client = new OkHttpClient();
+		Callback callback = new Callback() {
+			@Override
+			public void onFailure(@NotNull Call call, @NotNull IOException e) {
+				if (fileCallback != null) fileCallback.onDownloadStatus(false, "HTTP FAILURE");
+			}
+
+			@Override
+			public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+				try {
+					if (filePath == null) filePath = "DATA";
+					//File dir = new File(context.getFilesDir() + File.separator + filePath);
+					File dir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath() + File.separator + filePath);
+					if (!dir.exists()) dir.mkdirs();
+
+					File file = new File(dir.getPath() + File.separator + fileName);
+					File fileDir = new File(file.getParent() + File.separator);
+					if (!fileDir.exists()) fileDir.mkdirs();
+					if (file.exists()) file.delete();
+
+					file.createNewFile();
+
+					Log.d(TAG, "FileDownloadTask : Path : " + file.getPath());
+					Log.d(TAG, "FileDownloadTask : Parent : " + fileDir.getPath());
+					Log.d(TAG, "FileDownloadTask : AbsolutePath : " + file.getAbsolutePath());
+
+					InputStream input = response.body().byteStream();
+					OutputStream output = new FileOutputStream(file);
+
+					ByteArrayOutputStream byteOutput = new ByteArrayOutputStream(input.available());
+
+					byte[] buf = new byte[1024];
+					long total = 0;
+					int count = 0;
+
+					while ((count = input.read(buf)) > 0) {
+						total += count;
+						byteOutput.write(buf, 0, count);
+					}
+					try {
+						output.write(byteOutput.toByteArray());
+					} catch (Exception e) {
+						e.printStackTrace();
+						output.write(byteOutput.toByteArray());
+					}
+					isSuccess = true;
+					downloadedPath = file.getPath();
+				} catch (Exception e) {
+					e.printStackTrace();
+				} finally {
+					try {
+						if (output != null) output.close();
+						if (input != null) input.close();
+						if (byteOutput != null) byteOutput.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+				runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						TASK_FINISHED = true;
+						TASK_RESULT = isSuccess;
+						fileCallback.onDownloadStatus(isSuccess, downloadedPath);
+					}
+				});
+			}
+		};
+
+		public FileDownloadTask(Context context, String fileUrl, String filePath, String fileName, FileDownloadCallback fileCallback) {
+			this.context = context;
+			this.fileUrl = fileUrl;
+			this.filePath = filePath;
+			this.fileName = fileName;
+			this.fileCallback = fileCallback;
+		}
+
+		public void setDownloadIndicator(View downloadIndicator) {
+			this.downloadIndicator = downloadIndicator;
+		}
+
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+			TASK_FINISHED = false;
+			Log.d(TAG, "FileDownloadTask : " + fileUrl);
+		}
+
+		@Override
+		protected String doInBackground(String... params) {
+			try {
+				Request request = new Request.Builder()
+						.url(fileUrl)
+						.build();
+				client.newCall(request).enqueue(callback);
+			} catch (Exception e) {
+				e.printStackTrace();
+				return e.toString();
+			}
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(String message) {
+			super.onPostExecute(message);
+		}
+
 	}
 
 }
