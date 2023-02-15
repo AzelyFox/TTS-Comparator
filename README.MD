@@ -5,12 +5,12 @@
 
 <p align="center">
     <a href="#license">
-        <img src="https://img.shields.io/github/license/LIMECAKE/TTS-Comparator?style=flat-square" />
+        <img src="https://img.shields.io/github/license/AzelyFox/TTS-Comparator?style=flat-square" />
     </a>
-    <a href="https://github.com/LIMECAKE/TTS-Comparator/releases">
-        <img src="https://img.shields.io/github/v/release/LIMECAKE/TTS-Comparator?style=flat-square" />
+    <a href="https://github.com/AzelyFox/TTS-Comparator/releases">
+        <img src="https://img.shields.io/github/v/release/AzelyFox/TTS-Comparator?style=flat-square" />
     </a>
-    <a href="https://github.com/LIMECAKE/TTS-Comparator/issues">
+    <a href="https://github.com/AzelyFox/TTS-Comparator/issues">
         <img src="https://img.shields.io/badge/SUPPORT-END-black?style=flat-square" />
     </a>
 </p>
